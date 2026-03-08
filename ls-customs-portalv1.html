@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LS Customs — Employee Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0e;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2433;
+    --accent: #f5a623;
+    --accent2: #e8351a;
+    --accent3: #00d4ff;
+    --text: #e8eaf0;
+    --text-muted: #5a6070;
+    --text-dim: #8a92a0;
+    --success: #00c853;
+    --danger: #e8351a;
+    --glow: rgba(245,166,35,0.15);
+    --glow-red: rgba(232,53,26,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Exo 2', sans-serif; overflow-x: hidden; }
+
+  /* BACKGROUND GRID */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* SCANLINE EFFECT */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    pointer-events: none;
+  }
+
+  /* ===== LOGIN SCREEN ===== */
+  #login-screen {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    flex-direction: column;
+    gap: 0;
+  }
+  .login-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(245,166,35,0.5), 0 0 80px rgba(245,166,35,0.2);
+    animation: pulse-glow 3s ease-in-out infinite;
+    margin-bottom: 4px;
+  }
+  .login-sub {
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 40px rgba(245,166,35,0.5), 0 0 80px rgba(245,166,35,0.2); }
+    50% { text-shadow: 0 0 60px rgba(245,166,35,0.7), 0 0 120px rgba(245,166,35,0.4); }
+  }
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 36px 40px;
+    width: 360px;
+    position: relative;
+    box-shadow: 0 0 60px rgba(0,0,0,0.6), 0 0 30px var(--glow);
+  }
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 20px; right: 20px; height: 1px;
+    background: var(--accent);
+    filter: blur(3px);
+  }
+  .login-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--glow);
+  }
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0b0e;
+    border: none;
+    padding: 13px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: #ffb733; box-shadow: 0 0 20px var(--glow); }
+  .btn-primary:active { transform: scale(0.98); }
+  .login-error {
+    color: var(--danger);
+    font-size: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 12px;
+    text-align: center;
+    min-height: 18px;
+  }
+  /* ===== MAIN APP ===== */
+  #app { display: none; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    height: 60px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-brand {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+  }
+  .topbar-brand span { color: var(--text-muted); font-weight: 400; }
+  .topbar-right { display: flex; align-items: center; gap: 20px; }
+  .emp-badge {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+  .emp-badge-icon { width: 28px; height: 28px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+  .emp-badge-icon svg { width: 14px; height: 14px; fill: #0a0b0e; }
+  .emp-badge-name { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; }
+  .emp-badge-role { font-size: 0.6rem; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; }
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 7px 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-logout:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    gap: 0;
+  }
+  .nav-tab {
+    padding: 14px 24px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .nav-tab:hover { color: var(--text-dim); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-tab .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent2); color: #fff;
+    width: 16px; height: 16px; border-radius: 50%;
+    font-size: 0.55rem; margin-left: 6px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* CONTENT */
+  .content { padding: 28px; max-width: 1400px; margin: 0 auto; }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    position: relative;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .panel-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* STATS CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .stat-card:hover { border-color: rgba(245,166,35,0.3); transform: translateY(-2px); }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .stat-card:hover::after { transform: scaleX(1); }
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; font-family: 'Share Tech Mono', monospace; }
+
+  /* ORDER BUILDER */
+  .order-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+  @media (max-width: 900px) { .order-layout { grid-template-columns: 1fr; } }
+
+  .service-categories { display: flex; flex-direction: column; gap: 16px; }
+  .category-section { }
+  .category-header {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .category-header svg { width: 14px; height: 14px; fill: var(--accent2); }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .service-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-btn:hover {
+    border-color: var(--accent);
+    background: rgba(245,166,35,0.05);
+  }
+  .service-btn:active { transform: scale(0.97); }
+  .service-btn-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    display: block;
+  }
+  .service-btn-price {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+
+  /* ORDER CART */
+  .order-cart {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: sticky; top: 130px; max-height: calc(100vh - 150px);
+  }
+  .cart-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cart-items { flex: 1; overflow-y: auto; padding: 12px; }
+  .cart-items::-webkit-scrollbar { width: 4px; }
+  .cart-items::-webkit-scrollbar-track { background: var(--bg); }
+  .cart-items::-webkit-scrollbar-thumb { background: var(--border); }
+  .cart-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    animation: slide-in 0.2s ease;
+  }
+  @keyframes slide-in { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+  .cart-item-price { font-size: 0.7rem; font-family: 'Share Tech Mono', monospace; color: var(--accent); margin-top: 2px; }
+  .cart-item-remove {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; padding: 4px; font-size: 1rem; line-height: 1;
+    transition: color 0.2s;
+  }
+  .cart-item-remove:hover { color: var(--danger); }
+  .cart-empty {
+    padding: 40px 20px; text-align: center;
+    color: var(--text-muted); font-size: 0.8rem; font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.1em;
+  }
+  .cart-footer { border-top: 1px solid var(--border); padding: 16px 20px; }
+  .cart-customer-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .cart-customer-input:focus { border-color: var(--accent); }
+  .cart-total {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+  }
+  .cart-total-label { font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase; }
+  .cart-total-value { font-family: 'Rajdhani', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+  .btn-complete {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent2), #c02a12);
+    color: #fff;
+    border: none;
+    padding: 13px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, box-shadow 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(232,53,26,0.3);
+  }
+  .btn-complete:hover { opacity: 0.9; box-shadow: 0 4px 30px rgba(232,53,26,0.5); }
+  .btn-complete:active { transform: scale(0.98); }
+  .btn-complete:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-clear {
+    width: 100%;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 9px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-clear:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* MY STATS */
+  .stats-page { display: flex; flex-direction: column; gap: 20px; }
+  .history-table { width: 100%; border-collapse: collapse; }
+  .history-table th {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .history-table td {
+    padding: 11px 12px;
+    font-size: 0.82rem;
+    border-bottom: 1px solid rgba(30,36,51,0.6);
+    color: var(--text-dim);
+  }
+  .history-table tr:hover td { background: rgba(245,166,35,0.03); }
+  .history-table .amount { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
+  .history-table .customer { color: var(--text); font-weight: 500; }
+  .history-table .time { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text-muted); }
+
+  /* MANAGER VIEW */
+  .manager-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .emp-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .emp-card:hover { border-color: rgba(245,166,35,0.3); }
+  .emp-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .emp-avatar {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0a0b0e;
+    flex-shrink: 0;
+  }
+  .emp-card-name { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; }
+  .emp-card-id { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--text-muted); }
+  .emp-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .emp-stat { background: var(--bg); padding: 10px 12px; }
+  .emp-stat-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; margin-bottom: 4px; }
+  .emp-stat-val { font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+  .emp-projected {
+    margin-top: 12px; padding: 10px 12px;
+    background: rgba(232,53,26,0.08);
+    border: 1px solid rgba(232,53,26,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .emp-projected-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent2); font-family: 'Share Tech Mono', monospace; }
+  .emp-projected-val { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
+
+  /* MANAGE EMPLOYEES (manager only) */
+  .manage-section { }
+  .emp-mgmt-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .emp-mgmt-id { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--accent); width: 100px; }
+  .emp-mgmt-name { flex: 1; font-size: 0.88rem; font-weight: 600; }
+  .emp-mgmt-role { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; padding: 3px 8px; }
+  .role-manager { background: rgba(232,53,26,0.15); color: var(--accent2); border: 1px solid rgba(232,53,26,0.3); }
+  .role-employee { background: rgba(245,166,35,0.1); color: var(--accent); border: 1px solid rgba(245,166,35,0.3); }
+  .btn-sm {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 5px 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .add-emp-form {
+    display: flex; gap: 10px; align-items: flex-end;
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .add-emp-form .form-group { margin-bottom: 0; flex: 1; min-width: 140px; }
+  .role-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .role-select:focus { border-color: var(--accent); }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .toast-msg {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 12px 18px;
+    font-size: 0.8rem;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text);
+    min-width: 260px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    animation: toast-in 0.25s ease;
+  }
+  .toast-msg.error { border-left-color: var(--danger); }
+  .toast-msg.success { border-left-color: var(--success); }
+  @keyframes toast-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* MISC */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .loading { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; padding: 40px; text-align: center; letter-spacing: 0.1em; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+  .no-access { padding: 60px; text-align: center; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.1em; }
+  .accent { color: var(--accent); }
+  .accent2 { color: var(--accent2); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 32px;
+    width: 380px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.6);
+  }
+  .modal-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-ghost {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 11px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">LS CUSTOMS</div>
+  <div class="login-sub">Employee Portal &bull; Authorized Access Only</div>
+  <div class="login-card">
+    <div class="login-title">Sign In</div>
+    <div class="form-group">
+      <label class="form-label">Employee ID</label>
+      <input type="text" id="login-empid" class="form-input" placeholder="EMP-XXXX" autocomplete="off">
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">ACCESS PORTAL</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-brand">LS <span>CUSTOMS</span></div>
+    <div class="topbar-right">
+      <div class="emp-badge">
+        <div class="emp-badge-icon">
+          <svg viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm5 7H3a5 5 0 0 1 10 0z"/></svg>
+        </div>
+        <div>
+          <div class="emp-badge-name" id="display-name">—</div>
+          <div class="emp-badge-role" id="display-role">—</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()">SIGN OUT</button>
+    </div>
+  </div>
+
+  <!-- Nav Tabs -->
+  <div class="nav-tabs" id="nav-tabs">
+    <div class="nav-tab active" data-tab="order" onclick="switchTab('order')">BUILD ORDER</div>
+    <div class="nav-tab" data-tab="mystats" onclick="switchTab('mystats')">MY STATS</div>
+    <div class="nav-tab manager-only" data-tab="allstats" onclick="switchTab('allstats')" style="display:none">ALL STAFF</div>
+    <div class="nav-tab manager-only" data-tab="manage" onclick="switchTab('manage')" style="display:none">MANAGE STAFF</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ORDER TAB -->
+    <div id="tab-order" class="tab-content active">
+      <div class="order-layout">
+        <div class="service-categories" id="service-categories">
+          <!-- populated by JS -->
+        </div>
+        <div>
+          <div class="order-cart">
+            <div class="cart-header">
+              <span>CURRENT ORDER</span>
+              <span id="cart-count" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-muted)">0 items</span>
+            </div>
+            <div class="cart-items" id="cart-items">
+              <div class="cart-empty">No services added yet.</div>
+            </div>
+            <div class="cart-footer">
+              <input type="text" class="cart-customer-input" id="customer-name" placeholder="Customer / Vehicle (optional)">
+              <div class="cart-total">
+                <span class="cart-total-label">TOTAL</span>
+                <span class="cart-total-value" id="cart-total">$0</span>
+              </div>
+              <button class="btn-complete" id="btn-complete-order" onclick="completeOrder()">COMPLETE ORDER</button>
+              <button class="btn-clear" onclick="clearCart()">CLEAR ORDER</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY STATS TAB -->
+    <div id="tab-mystats" class="tab-content">
+      <div class="stats-page">
+        <div class="stats-grid" id="my-stats-grid">
+          <!-- populated -->
+        </div>
+        <div class="panel">
+          <div class="panel-title">Recent Orders</div>
+          <div id="my-history">
+            <div class="loading">Loading history...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL STATS TAB (manager) -->
+    <div id="tab-allstats" class="tab-content">
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-title">Staff Performance Overview</div>
+        <div class="manager-grid" id="manager-grid">
+          <div class="loading">Loading staff data...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE STAFF TAB (manager) -->
+    <div id="tab-manage" class="tab-content">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title">Active Employees</div>
+          <div id="emp-list">
+            <div class="loading">Loading...</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Add New Employee</div>
+          <div class="add-emp-form">
+            <div class="form-group" style="flex:0 0 130px">
+              <label class="form-label">Employee ID</label>
+              <input type="text" class="form-input" id="new-empid" placeholder="EMP-0001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Name</label>
+              <input type="text" class="form-input" id="new-name" placeholder="Full name">
+            </div>
+            <div class="form-group" style="flex:0 0 140px">
+              <label class="form-label">Role</label>
+              <select class="role-select" id="new-role">
+                <option value="employee">Employee</option>
+                <option value="manager">Manager</option>
+              </select>
+            </div>
+            <button class="btn-primary" style="white-space:nowrap;padding:11px 20px;flex:0 0 auto" onclick="addEmployee()">ADD EMPLOYEE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-title" id="confirm-title">Confirm Action</div>
+    <div id="confirm-body" style="font-size:0.85rem;color:var(--text-dim);line-height:1.6"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeConfirm()">CANCEL</button>
+      <button class="btn-primary" style="flex:1;margin-top:0" id="confirm-ok-btn">CONFIRM</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ============================================================
+// 🔥 FIREBASE CONFIG — Replace with your project's config
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCoajQr3F4GqCJ1qakWRjh6mgO2AzDdlfQ",
+  authDomain: "ls-customs---ken.firebaseapp.com",
+  projectId: "ls-customs---ken",
+  storageBucket: "ls-customs---ken.firebasestorage.app",
+  messagingSenderId: "303151429760",
+  appId: "1:303151429760:web:e0787deba9ecc6e04b4e65",
+  measurementId: "G-C1F66HHFJK"
+};
+// ============================================================
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ===== STATE =====
+let currentUser = null;
+let cart = [];
+let confirmCallback = null;
+
+// ===== SERVICES DATA =====
+const SERVICES = {
+  "Engine & Performance": [
+    { name: "Turbo", price: 1000 },
+    { name: "Engine Tune-Up (ECU)", price: 1000 },
+    { name: "Transmission Upgrade", price: 1000 },
+    { name: "Brakes Upgrade", price: 1000 },
+    { name: "Suspension Upgrade", price: 1000 },
+    { name: "NOS System [Not to be Used]", price: 0 },
+  ],
+  "Body & Aesthetics": [
+    { name: "Cosmetics", price: 250 },
+    { name: "Wheels", price: 500 },
+  ],
+  "Resprays": [
+    { name: "Primary Respray", price: 150 },
+    { name: "Secondary Respray", price: 150 },
+    { name: "Pearlescent Respray", price: 100 },
+    { name: "Wheel Respray", price: 150 },
+    { name: "Dashboard Respray", price: 100 },
+    { name: "Interior Respray", price: 100 },
+  ],
+};
+
+// Flat lookup map built once so onclick can use a simple integer key
+const SERVICE_MAP = {};
+let _svcIdx = 0;
+Object.values(SERVICES).forEach(list => list.forEach(s => { SERVICE_MAP[_svcIdx] = s; _svcIdx++; }));
+
+// ===== CART =====
+function addToCart(service) {
+  cart.push({ ...service, id: Date.now() + Math.random() });
+  renderCart();
+  showToast(`Added: ${service.name}`);
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(i => i.id !== id);
+  renderCart();
+}
+
+window.clearCart = function() {
+  cart = [];
+  renderCart();
+}
+
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  const totalEl = document.getElementById('cart-total');
+  const countEl = document.getElementById('cart-count');
+  const total = cart.reduce((s, i) => s + i.price, 0);
+
+  countEl.textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''}`;
+  totalEl.textContent = '$' + total.toLocaleString();
+
+  if (cart.length === 0) {
+    container.innerHTML = '<div class="cart-empty">No services added yet.</div>';
+    return;
+  }
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">$${item.price.toLocaleString()}</div>
+      </div>
+      <button class="cart-item-remove" onclick="window._removeCart(${item.id})">✕</button>
+    </div>
+  `).join('');
+}
+window._removeCart = (id) => { removeFromCart(id); };
+
+// ===== COMPLETE ORDER =====
+window.completeOrder = async function() {
+  if (cart.length === 0) { showToast('Add services first', 'error'); return; }
+  const total = cart.reduce((s, i) => s + i.price, 0);
+  const customer = document.getElementById('customer-name').value.trim() || 'Walk-in Customer';
+  const items = cart.map(i => i.name);
+
+  try {
+    // Save order to Firestore
+    await addDoc(collection(db, 'orders'), {
+      employeeId: currentUser.employeeId,
+      employeeName: currentUser.name,
+      customer,
+      items,
+      total,
+      timestamp: serverTimestamp()
+    });
+
+    // Update employee stats
+    const statsRef = doc(db, 'stats', currentUser.employeeId);
+    const statsSnap = await getDoc(statsRef);
+    if (statsSnap.exists()) {
+      const d = statsSnap.data();
+      await updateDoc(statsRef, {
+        totalSales: (d.totalSales || 0) + total,
+        orderCount: (d.orderCount || 0) + 1,
+        lastOrder: serverTimestamp()
+      });
+    } else {
+      await setDoc(statsRef, {
+        employeeId: currentUser.employeeId,
+        employeeName: currentUser.name,
+        totalSales: total,
+        orderCount: 1,
+        lastOrder: serverTimestamp()
+      });
+    }
+
+    showToast(`Order complete! $${total.toLocaleString()} charged to ${customer}`, 'success');
+    clearCart();
+    document.getElementById('customer-name').value = '';
+
+    // If already on My Stats tab, refresh it automatically
+    const activeTab = document.querySelector('.nav-tab.active')?.dataset?.tab;
+    if (activeTab === 'mystats') {
+      setTimeout(() => loadMyStats(), 800);
+    }
+  } catch(e) {
+    showToast('Error saving order: ' + e.message, 'error');
+  }
+}
+
+// ===== RENDER SERVICES =====
+function renderServices() {
+  const container = document.getElementById('service-categories');
+  let idx = 0;
+  container.innerHTML = Object.entries(SERVICES).map(([cat, services]) => `
+    <div class="category-section">
+      <div class="category-header">
+        <svg viewBox="0 0 16 16"><path d="M2 2h2v2H2V2zm0 4h2v2H2V6zm0 4h2v2H2v-2zm4-8h8v2H6V2zm0 4h8v2H6V6zm0 4h8v2H6v-2z"/></svg>
+        ${cat}
+      </div>
+      <div class="services-grid">
+        ${services.map(s => {
+          const i = idx++;
+          return `<button class="service-btn" onclick="window._addService(${i})">
+            <span class="service-btn-name">${s.name}</span>
+            <span class="service-btn-price">${s.price > 0 ? '$' + s.price.toLocaleString() : 'FREE'}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+window._addService = (idx) => addToCart(SERVICE_MAP[idx]);
+
+// ===== MY STATS =====
+async function loadMyStats() {
+  const statsRef = doc(db, 'stats', currentUser.employeeId);
+  const snap = await getDoc(statsRef);
+  const stats = snap.exists() ? snap.data() : { totalSales: 0, orderCount: 0 };
+
+  // Simple query with no orderBy — avoids needing a composite Firestore index
+  const q = query(collection(db, 'orders'), where('employeeId', '==', currentUser.employeeId));
+  const ordersSnap = await getDocs(q);
+  const orders = [];
+  ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+  // Sort client-side newest first
+  orders.sort((a, b) => {
+    const ta = a.timestamp?.toDate?.() || new Date(0);
+    const tb = b.timestamp?.toDate?.() || new Date(0);
+    return tb - ta;
+  });
+
+  const avg = stats.orderCount > 0 ? Math.round(stats.totalSales / stats.orderCount) : 0;
+
+  document.getElementById('my-stats-grid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-value">$${(stats.totalSales||0).toLocaleString()}</div>
+      <div class="stat-sub">All-time sales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Orders Completed</div>
+      <div class="stat-value">${stats.orderCount||0}</div>
+      <div class="stat-sub">Total transactions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Order Value</div>
+      <div class="stat-value">$${avg.toLocaleString()}</div>
+      <div class="stat-sub">Per transaction</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rank</div>
+      <div class="stat-value" style="color:var(--accent2)">${currentUser.role === 'manager' ? 'MGR' : 'EMP'}</div>
+      <div class="stat-sub">${currentUser.employeeId}</div>
+    </div>
+  `;
+
+  // Load recent order history
+  const histEl = document.getElementById('my-history');
+  if (orders.length === 0) {
+    histEl.innerHTML = '<div class="loading">No orders yet. Complete your first order!</div>';
+    return;
+  }
+  histEl.innerHTML = `
+    <table class="history-table">
+      <thead><tr>
+        <th>Customer / Vehicle</th>
+        <th>Services</th>
+        <th>Total</th>
+        <th>Date</th>
+      </tr></thead>
+      <tbody>
+        ${orders.map(o => {
+          let dateStr = '—';
+          if (o.timestamp) {
+            const d = o.timestamp instanceof Date ? o.timestamp : (o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp));
+            dateStr = d.toLocaleString();
+          }
+          return `<tr>
+            <td class="customer">${o.customer}</td>
+            <td style="max-width:220px;color:var(--text-muted);font-size:0.75rem">${(o.items||[]).join(', ')}</td>
+            <td class="amount">$${(o.total||0).toLocaleString()}</td>
+            <td class="time">${dateStr}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ===== MANAGER: ALL STATS =====
+async function loadAllStats() {
+  const empsSnap = await getDocs(collection(db, 'employees'));
+  const emps = [];
+  empsSnap.forEach(d => emps.push({ id: d.id, ...d.data() }));
+  const statsSnap = await getDocs(collection(db, 'stats'));
+  const statsMap = {};
+  statsSnap.forEach(d => { statsMap[d.id] = d.data(); });
+
+  const grid = document.getElementById('manager-grid');
+  if (emps.length === 0) { grid.innerHTML = '<div class="loading">No employees found.</div>'; return; }
+
+  // Calculate projected monthly (simple: current sales * (days in month / day of month))
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const projMultiplier = daysInMonth / dayOfMonth;
+
+  grid.innerHTML = emps.map(emp => {
+    const stats = statsMap[emp.employeeId] || { totalSales: 0, orderCount: 0 };
+    const projected = Math.round((stats.totalSales || 0) * projMultiplier);
+    const initials = (emp.name || emp.employeeId).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `
+      <div class="emp-card">
+        <div class="emp-card-header">
+          <div class="emp-avatar">${initials}</div>
+          <div>
+            <div class="emp-card-name">${emp.name || emp.employeeId}</div>
+            <div class="emp-card-id">${emp.employeeId} &bull; <span class="${emp.role === 'manager' ? 'accent2' : 'accent'}">${emp.role?.toUpperCase()}</span></div>
+          </div>
+        </div>
+        <div class="emp-card-stats">
+          <div class="emp-stat">
+            <div class="emp-stat-label">Total Sales</div>
+            <div class="emp-stat-val">$${(stats.totalSales||0).toLocaleString()}</div>
+          </div>
+          <div class="emp-stat">
+            <div class="emp-stat-label">Orders</div>
+            <div class="emp-stat-val">${stats.orderCount||0}</div>
+          </div>
+        </div>
+        <div class="emp-projected">
+          <span class="emp-projected-label">Projected Monthly</span>
+          <span class="emp-projected-val">$${projected.toLocaleString()}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== MANAGER: MANAGE STAFF =====
+async function loadManageStaff() {
+  const snap = await getDocs(collection(db, 'employees'));
+  const emps = [];
+  snap.forEach(d => emps.push({ docId: d.id, ...d.data() }));
+
+  const listEl = document.getElementById('emp-list');
+  if (emps.length === 0) { listEl.innerHTML = '<div class="loading">No employees yet.</div>'; return; }
+
+  listEl.innerHTML = emps.map(emp => `
+    <div class="emp-mgmt-row">
+      <span class="emp-mgmt-id">${emp.employeeId}</span>
+      <span class="emp-mgmt-name">${emp.name || '—'}</span>
+      <span class="emp-mgmt-role ${emp.role === 'manager' ? 'role-manager' : 'role-employee'}">${emp.role}</span>
+      <button class="btn-sm danger" onclick="window._removeEmp('${emp.docId}', '${emp.name || emp.employeeId}')">REMOVE</button>
+    </div>
+  `).join('');
+}
+
+window._removeEmp = (docId, name) => {
+  showConfirm(
+    'Remove Employee',
+    `Are you sure you want to remove <strong style="color:var(--accent)">${name}</strong>? This will revoke their portal access.`,
+    async () => {
+      await deleteDoc(doc(db, 'employees', docId));
+      showToast(`${name} removed`, 'success');
+      loadManageStaff();
+    }
+  );
+};
+
+window.addEmployee = async function() {
+  const empId = document.getElementById('new-empid').value.trim().toUpperCase();
+  const name = document.getElementById('new-name').value.trim();
+  const role = document.getElementById('new-role').value;
+
+  if (!empId || !name) { showToast('Fill in all fields', 'error'); return; }
+
+  try {
+    await setDoc(doc(db, 'employees', empId), {
+      employeeId: empId,
+      name,
+      role,
+      createdAt: serverTimestamp()
+    });
+    showToast(`${name} added as ${role}`, 'success');
+    document.getElementById('new-empid').value = '';
+    document.getElementById('new-name').value = '';
+    loadManageStaff();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+};
+
+// ===== LOGIN =====
+window.handleLogin = async function() {
+  const empId = document.getElementById('login-empid').value.trim().toUpperCase();
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+
+  if (!empId) { errEl.textContent = 'Enter your Employee ID.'; return; }
+
+  try {
+    const empDoc = await getDoc(doc(db, 'employees', empId));
+    if (!empDoc.exists()) { errEl.textContent = 'Employee ID not found.'; return; }
+
+    currentUser = empDoc.data();
+    sessionStorage.setItem('lsc_user', JSON.stringify(currentUser));
+    bootApp();
+  } catch(e) {
+    errEl.textContent = 'Connection error. Check Firebase config.';
+    console.error(e);
+  }
+};
+
+window.handleLogout = function() {
+  sessionStorage.removeItem('lsc_user');
+  currentUser = null;
+  cart = [];
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-empid').value = '';
+};
+
+// ===== BOOT =====
+function bootApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('display-name').textContent = currentUser.name || currentUser.employeeId;
+  document.getElementById('display-role').textContent = currentUser.role?.toUpperCase();
+
+  // Show manager tabs
+  if (currentUser.role === 'manager') {
+    document.querySelectorAll('.manager-only').forEach(el => el.style.display = 'block');
+  }
+
+  renderServices();
+  renderCart();
+}
+
+// ===== TAB SWITCHING =====
+window.switchTab = function(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+
+  if (tab === 'mystats') loadMyStats();
+  if (tab === 'allstats') loadAllStats();
+  if (tab === 'manage') loadManageStaff();
+};
+
+// ===== TOAST =====
+window.showToast = function(msg, type = '') {
+  const container = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = `toast-msg ${type}`;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+};
+
+// ===== CONFIRM MODAL =====
+function showConfirm(title, body, cb) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').innerHTML = body;
+  document.getElementById('confirm-modal').classList.add('open');
+  confirmCallback = cb;
+}
+window.closeConfirm = function() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  confirmCallback = null;
+};
+document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+  if (confirmCallback) confirmCallback();
+  closeConfirm();
+});
+
+// ===== AUTO LOGIN FROM SESSION =====
+const savedUser = sessionStorage.getItem('lsc_user');
+if (savedUser) {
+  currentUser = JSON.parse(savedUser);
+  bootApp();
+}
+
+// Enter key on login
+document.getElementById('login-empid').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+</script>
+</body>
+</html>
