@@ -523,8 +523,31 @@
   .emp-mgmt-id { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--accent); width: 100px; }
   .emp-mgmt-name { flex: 1; font-size: 0.88rem; font-weight: 600; }
   .emp-mgmt-role { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; padding: 3px 8px; }
-  .role-manager { background: rgba(232,53,26,0.15); color: var(--accent2); border: 1px solid rgba(232,53,26,0.3); }
-  .role-employee { background: rgba(245,166,35,0.1); color: var(--accent); border: 1px solid rgba(245,166,35,0.3); }
+  .role-manager      { background: rgba(232,53,26,0.15);  color: var(--accent2); border: 1px solid rgba(232,53,26,0.3); }
+  .role-head-mechanic{ background: rgba(0,212,255,0.12);  color: #00d4ff;        border: 1px solid rgba(0,212,255,0.3); }
+  .role-mechanic     { background: rgba(245,166,35,0.12); color: var(--accent);  border: 1px solid rgba(245,166,35,0.3); }
+  .role-trainee      { background: rgba(138,146,160,0.15);color: var(--text-dim);border: 1px solid rgba(138,146,160,0.25); }
+  .role-employee     { background: rgba(245,166,35,0.1);  color: var(--accent);  border: 1px solid rgba(245,166,35,0.3); }
+
+  /* COMMISSION BREAKDOWN in cart */
+  .commission-box {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(0,200,83,0.07);
+    border: 1px solid rgba(0,200,83,0.2);
+  }
+  .commission-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+  .commission-row:last-child { margin-bottom: 0; }
+  .commission-row .comm-label { letter-spacing: 0.08em; }
+  .commission-row .comm-val { color: #00c853; font-weight: 600; }
+  .commission-row.comm-total .comm-label { color: var(--text-dim); }
+  .commission-row.comm-total .comm-val { font-size: 0.9rem; color: #00c853; }
   .btn-sm {
     background: transparent;
     border: 1px solid var(--border);
@@ -704,6 +727,16 @@
                 <span class="cart-total-label">TOTAL</span>
                 <span class="cart-total-value" id="cart-total">$0</span>
               </div>
+              <div class="commission-box" id="commission-box" style="display:none">
+                <div class="commission-row">
+                  <span class="comm-label" id="comm-rate-label">COMMISSION RATE</span>
+                  <span class="comm-val" id="comm-rate">—</span>
+                </div>
+                <div class="commission-row comm-total">
+                  <span class="comm-label">YOUR EARNINGS</span>
+                  <span class="comm-val" id="comm-amount">$0</span>
+                </div>
+              </div>
               <button class="btn-complete" id="btn-complete-order" onclick="completeOrder()">COMPLETE ORDER</button>
               <button class="btn-clear" onclick="clearCart()">CLEAR ORDER</button>
             </div>
@@ -760,7 +793,9 @@
             <div class="form-group" style="flex:0 0 140px">
               <label class="form-label">Role</label>
               <select class="role-select" id="new-role">
-                <option value="employee">Employee</option>
+                <option value="trainee">Trainee (15%)</option>
+                <option value="mechanic">Mechanic (20%)</option>
+                <option value="head mechanic">Head Mechanic (25%)</option>
                 <option value="manager">Manager</option>
               </select>
             </div>
@@ -814,6 +849,26 @@ const db = getFirestore(app);
 let currentUser = null;
 let cart = [];
 let confirmCallback = null;
+
+// ===== COMMISSION =====
+const COMMISSION_RATES = {
+  'trainee':      0.15,
+  'mechanic':     0.20,
+  'head mechanic':0.25,
+  'manager':      0,
+};
+function getCommission(role) { return COMMISSION_RATES[role?.toLowerCase()] ?? 0; }
+function commissionLabel(role) {
+  const r = role?.toLowerCase();
+  if (r === 'trainee')       return 'TRAINEE — 15%';
+  if (r === 'mechanic')      return 'MECHANIC — 20%';
+  if (r === 'head mechanic') return 'HEAD MECHANIC — 25%';
+  return null;
+}
+function roleClass(role) {
+  const r = role?.toLowerCase().replace(' ', '-');
+  return `role-${r}`;
+}
 
 // ===== SERVICES DATA =====
 const SERVICES = {
@@ -870,6 +925,22 @@ function renderCart() {
   countEl.textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''}`;
   totalEl.textContent = '$' + total.toLocaleString();
 
+  // Commission display
+  const commBox  = document.getElementById('commission-box');
+  const commRate = document.getElementById('comm-rate');
+  const commAmt  = document.getElementById('comm-amount');
+  const commLbl  = document.getElementById('comm-rate-label');
+  const rate = getCommission(currentUser?.role);
+  const label = commissionLabel(currentUser?.role);
+  if (label && cart.length > 0) {
+    commBox.style.display = 'block';
+    commLbl.textContent = label;
+    commRate.textContent = `$${(total * rate).toLocaleString()}`;
+    commAmt.textContent  = `$${(total * rate).toLocaleString()}`;
+  } else {
+    commBox.style.display = 'none';
+  }
+
   if (cart.length === 0) {
     container.innerHTML = '<div class="cart-empty">No services added yet.</div>';
     return;
@@ -892,47 +963,48 @@ window.completeOrder = async function() {
   const total = cart.reduce((s, i) => s + i.price, 0);
   const customer = document.getElementById('customer-name').value.trim() || 'Walk-in Customer';
   const items = cart.map(i => i.name);
+  const rate = getCommission(currentUser.role);
+  const commission = Math.round(total * rate);
 
   try {
-    // Save order to Firestore
     await addDoc(collection(db, 'orders'), {
       employeeId: currentUser.employeeId,
       employeeName: currentUser.name,
-      customer,
-      items,
-      total,
+      employeeRole: currentUser.role,
+      customer, items, total, commission,
+      commissionRate: rate,
       timestamp: serverTimestamp()
     });
 
-    // Update employee stats
     const statsRef = doc(db, 'stats', currentUser.employeeId);
     const statsSnap = await getDoc(statsRef);
     if (statsSnap.exists()) {
       const d = statsSnap.data();
       await updateDoc(statsRef, {
-        totalSales: (d.totalSales || 0) + total,
-        orderCount: (d.orderCount || 0) + 1,
+        totalSales:      (d.totalSales      || 0) + total,
+        totalCommission: (d.totalCommission || 0) + commission,
+        orderCount:      (d.orderCount      || 0) + 1,
         lastOrder: serverTimestamp()
       });
     } else {
       await setDoc(statsRef, {
         employeeId: currentUser.employeeId,
         employeeName: currentUser.name,
+        employeeRole: currentUser.role,
         totalSales: total,
+        totalCommission: commission,
         orderCount: 1,
         lastOrder: serverTimestamp()
       });
     }
 
-    showToast(`Order complete! $${total.toLocaleString()} charged to ${customer}`, 'success');
+    const commMsg = commission > 0 ? ` — Your cut: $${commission.toLocaleString()}` : '';
+    showToast(`Order complete! $${total.toLocaleString()} charged${commMsg}`, 'success');
     clearCart();
     document.getElementById('customer-name').value = '';
 
-    // If already on My Stats tab, refresh it automatically
     const activeTab = document.querySelector('.nav-tab.active')?.dataset?.tab;
-    if (activeTab === 'mystats') {
-      setTimeout(() => loadMyStats(), 800);
-    }
+    if (activeTab === 'mystats') setTimeout(() => loadMyStats(), 800);
   } catch(e) {
     showToast('Error saving order: ' + e.message, 'error');
   }
@@ -966,14 +1038,12 @@ window._addService = (idx) => addToCart(SERVICE_MAP[idx]);
 async function loadMyStats() {
   const statsRef = doc(db, 'stats', currentUser.employeeId);
   const snap = await getDoc(statsRef);
-  const stats = snap.exists() ? snap.data() : { totalSales: 0, orderCount: 0 };
+  const stats = snap.exists() ? snap.data() : { totalSales: 0, orderCount: 0, totalCommission: 0 };
 
-  // Simple query with no orderBy — avoids needing a composite Firestore index
   const q = query(collection(db, 'orders'), where('employeeId', '==', currentUser.employeeId));
   const ordersSnap = await getDocs(q);
   const orders = [];
   ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
-  // Sort client-side newest first
   orders.sort((a, b) => {
     const ta = a.timestamp?.toDate?.() || new Date(0);
     const tb = b.timestamp?.toDate?.() || new Date(0);
@@ -981,10 +1051,15 @@ async function loadMyStats() {
   });
 
   const avg = stats.orderCount > 0 ? Math.round(stats.totalSales / stats.orderCount) : 0;
+  const rate = getCommission(currentUser.role);
+  const label = commissionLabel(currentUser.role);
+  const totalComm = stats.totalCommission || Math.round((stats.totalSales || 0) * rate);
+
+  const roleDisplay = (currentUser.role || 'employee').toUpperCase().replace(' ', '&nbsp;');
 
   document.getElementById('my-stats-grid').innerHTML = `
     <div class="stat-card">
-      <div class="stat-label">Total Revenue</div>
+      <div class="stat-label">Total Revenue Generated</div>
       <div class="stat-value">$${(stats.totalSales||0).toLocaleString()}</div>
       <div class="stat-sub">All-time sales</div>
     </div>
@@ -998,25 +1073,33 @@ async function loadMyStats() {
       <div class="stat-value">$${avg.toLocaleString()}</div>
       <div class="stat-sub">Per transaction</div>
     </div>
+    ${label ? `
     <div class="stat-card">
-      <div class="stat-label">Rank</div>
-      <div class="stat-value" style="color:var(--accent2)">${currentUser.role === 'manager' ? 'MGR' : 'EMP'}</div>
+      <div class="stat-label">Total Commission Earned</div>
+      <div class="stat-value" style="color:#00c853">$${totalComm.toLocaleString()}</div>
+      <div class="stat-sub">${label}</div>
+    </div>` : `
+    <div class="stat-card">
+      <div class="stat-label">Role</div>
+      <div class="stat-value" style="color:var(--accent2);font-size:1.3rem">${roleDisplay}</div>
       <div class="stat-sub">${currentUser.employeeId}</div>
-    </div>
+    </div>`}
   `;
 
-  // Load recent order history
   const histEl = document.getElementById('my-history');
   if (orders.length === 0) {
     histEl.innerHTML = '<div class="loading">No orders yet. Complete your first order!</div>';
     return;
   }
+
+  const showComm = !!label;
   histEl.innerHTML = `
     <table class="history-table">
       <thead><tr>
         <th>Customer / Vehicle</th>
         <th>Services</th>
         <th>Total</th>
+        ${showComm ? '<th style="color:#00c853">Commission</th>' : ''}
         <th>Date</th>
       </tr></thead>
       <tbody>
@@ -1026,10 +1109,12 @@ async function loadMyStats() {
             const d = o.timestamp instanceof Date ? o.timestamp : (o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp));
             dateStr = d.toLocaleString();
           }
+          const orderComm = o.commission ?? Math.round((o.total||0) * rate);
           return `<tr>
             <td class="customer">${o.customer}</td>
             <td style="max-width:220px;color:var(--text-muted);font-size:0.75rem">${(o.items||[]).join(', ')}</td>
             <td class="amount">$${(o.total||0).toLocaleString()}</td>
+            ${showComm ? `<td style="font-family:'Share Tech Mono',monospace;color:#00c853">$${orderComm.toLocaleString()}</td>` : ''}
             <td class="time">${dateStr}</td>
           </tr>`;
         }).join('')}
@@ -1057,16 +1142,21 @@ async function loadAllStats() {
   const projMultiplier = daysInMonth / dayOfMonth;
 
   grid.innerHTML = emps.map(emp => {
-    const stats = statsMap[emp.employeeId] || { totalSales: 0, orderCount: 0 };
+    const stats = statsMap[emp.employeeId] || { totalSales: 0, orderCount: 0, totalCommission: 0 };
     const projected = Math.round((stats.totalSales || 0) * projMultiplier);
     const initials = (emp.name || emp.employeeId).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const rate = getCommission(emp.role);
+    const commLabel = commissionLabel(emp.role);
+    const totalComm = stats.totalCommission || Math.round((stats.totalSales || 0) * rate);
+    const projComm = Math.round(totalComm * projMultiplier);
+    const rc = roleClass(emp.role);
     return `
       <div class="emp-card">
         <div class="emp-card-header">
           <div class="emp-avatar">${initials}</div>
           <div>
             <div class="emp-card-name">${emp.name || emp.employeeId}</div>
-            <div class="emp-card-id">${emp.employeeId} &bull; <span class="${emp.role === 'manager' ? 'accent2' : 'accent'}">${emp.role?.toUpperCase()}</span></div>
+            <div class="emp-card-id">${emp.employeeId} &bull; <span class="emp-mgmt-role ${rc}" style="padding:2px 6px;font-size:0.6rem">${(emp.role||'').toUpperCase()}</span></div>
           </div>
         </div>
         <div class="emp-card-stats">
@@ -1078,11 +1168,21 @@ async function loadAllStats() {
             <div class="emp-stat-label">Orders</div>
             <div class="emp-stat-val">${stats.orderCount||0}</div>
           </div>
+          ${commLabel ? `
+          <div class="emp-stat" style="grid-column:1/-1">
+            <div class="emp-stat-label">Commission Earned (${commLabel})</div>
+            <div class="emp-stat-val" style="color:#00c853">$${totalComm.toLocaleString()}</div>
+          </div>` : ''}
         </div>
         <div class="emp-projected">
-          <span class="emp-projected-label">Projected Monthly</span>
+          <span class="emp-projected-label">Projected Monthly Revenue</span>
           <span class="emp-projected-val">$${projected.toLocaleString()}</span>
         </div>
+        ${commLabel ? `
+        <div class="emp-projected" style="margin-top:6px;background:rgba(0,200,83,0.07);border-color:rgba(0,200,83,0.2)">
+          <span class="emp-projected-label" style="color:#00c853">Projected Monthly Commission</span>
+          <span class="emp-projected-val" style="color:#00c853">$${projComm.toLocaleString()}</span>
+        </div>` : ''}
       </div>
     `;
   }).join('');
@@ -1101,7 +1201,7 @@ async function loadManageStaff() {
     <div class="emp-mgmt-row">
       <span class="emp-mgmt-id">${emp.employeeId}</span>
       <span class="emp-mgmt-name">${emp.name || '—'}</span>
-      <span class="emp-mgmt-role ${emp.role === 'manager' ? 'role-manager' : 'role-employee'}">${emp.role}</span>
+      <span class="emp-mgmt-role ${roleClass(emp.role)}">${(emp.role||'').toUpperCase()}</span>
       <button class="btn-sm danger" onclick="window._removeEmp('${emp.docId}', '${emp.name || emp.employeeId}')">REMOVE</button>
     </div>
   `).join('');
