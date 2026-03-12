@@ -151,6 +151,42 @@
     text-align: center;
     min-height: 18px;
   }
+  .remember-row {
+    display: flex; align-items: center; gap: 10px;
+    margin: 14px 0 4px;
+    cursor: pointer;
+  }
+  .remember-row input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .remember-row input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .remember-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 5px;
+    width: 4px; height: 8px;
+    border: 2px solid #0a0b0e;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .remember-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    user-select: none;
+  }
   /* ===== MAIN APP ===== */
   #app { display: none; min-height: 100vh; position: relative; z-index: 1; }
 
@@ -685,11 +721,17 @@
   <div class="login-sub">Employee Portal &bull; Authorized Access Only</div>
   <div class="login-card">
     <div class="login-title">Sign In</div>
-    <div class="form-group">
-      <label class="form-label">Employee ID</label>
-      <input type="text" id="login-empid" class="form-input" placeholder="EMP-XXXX" autocomplete="off">
-    </div>
-    <button class="btn-primary" onclick="handleLogin()">ACCESS PORTAL</button>
+    <form id="login-form" onsubmit="handleLogin(); return false;" autocomplete="on">
+      <div class="form-group">
+        <label class="form-label" for="login-empid">Employee ID</label>
+        <input type="text" id="login-empid" name="username" class="form-input" placeholder="EMP-XXXX" autocomplete="username">
+      </div>
+      <label class="remember-row">
+        <input type="checkbox" id="remember-me">
+        <span class="remember-label">Stay logged in on this device</span>
+      </label>
+      <button type="submit" class="btn-primary">ACCESS PORTAL</button>
+    </form>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -1427,6 +1469,7 @@ window.addEmployee = async function() {
 // ===== LOGIN =====
 window.handleLogin = async function() {
   const empId = document.getElementById('login-empid').value.trim().toUpperCase();
+  const remember = document.getElementById('remember-me').checked;
   const errEl = document.getElementById('login-error');
   errEl.textContent = '';
 
@@ -1438,6 +1481,13 @@ window.handleLogin = async function() {
 
     currentUser = empDoc.data();
     sessionStorage.setItem('lsc_user', JSON.stringify(currentUser));
+    if (remember) {
+      localStorage.setItem('lsc_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('lsc_user');
+    }
+    // Always remember the ID so it can be pre-filled next time
+    localStorage.setItem('lsc_last_id', empId);
     bootApp();
   } catch(e) {
     errEl.textContent = 'Connection error. Check Firebase config.';
@@ -1447,11 +1497,13 @@ window.handleLogin = async function() {
 
 window.handleLogout = function() {
   sessionStorage.removeItem('lsc_user');
+  localStorage.removeItem('lsc_user');
   currentUser = null;
   cart = [];
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-empid').value = '';
+  document.getElementById('remember-me').checked = false;
 };
 
 // ===== BOOT =====
@@ -1508,11 +1560,27 @@ document.getElementById('confirm-ok-btn').addEventListener('click', () => {
   closeConfirm();
 });
 
-// ===== AUTO LOGIN FROM SESSION =====
-const savedUser = sessionStorage.getItem('lsc_user');
-if (savedUser) {
-  currentUser = JSON.parse(savedUser);
+// ===== AUTO LOGIN =====
+// Check localStorage first (stay logged in), then sessionStorage (tab session)
+const persistedUser = localStorage.getItem('lsc_user');
+const sessionUser   = sessionStorage.getItem('lsc_user');
+
+if (persistedUser) {
+  // Fully remembered — boot straight in
+  currentUser = JSON.parse(persistedUser);
+  sessionStorage.setItem('lsc_user', persistedUser); // sync session too
   bootApp();
+} else if (sessionUser) {
+  // Session only — boot in but don't persist
+  currentUser = JSON.parse(sessionUser);
+  bootApp();
+} else {
+  // No saved session — pre-fill ID if stored and tick the checkbox
+  const savedId = localStorage.getItem('lsc_last_id');
+  if (savedId) {
+    document.getElementById('login-empid').value = savedId;
+    document.getElementById('remember-me').checked = true;
+  }
 }
 
 // Enter key on login
