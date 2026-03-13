@@ -550,6 +550,151 @@
   .emp-projected-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent2); font-family: 'Share Tech Mono', monospace; }
   .emp-projected-val { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
 
+  /* ROLE BADGES */
+  .role-badge {
+    display: inline-block;
+    font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace; padding: 3px 8px;
+    border: 1px solid; white-space: nowrap;
+  }
+  .role-badge.role-manager      { background: rgba(232,53,26,0.15);  color: var(--accent2); border-color: rgba(232,53,26,0.35); }
+  .role-badge.role-trainee      { background: rgba(0,212,255,0.10);  color: var(--accent3); border-color: rgba(0,212,255,0.3); }
+  .role-badge.role-mechanic     { background: rgba(245,166,35,0.12); color: var(--accent);  border-color: rgba(245,166,35,0.35); }
+  .role-badge.role-head-mechanic{ background: rgba(0,200,83,0.12);   color: #00c853;        border-color: rgba(0,200,83,0.35); }
+
+  /* ADVANCED STAFF OVERVIEW */
+  .staff-overview { display: flex; flex-direction: column; gap: 20px; }
+  .overview-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+  .overview-stat-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 16px 18px; position: relative; overflow: hidden;
+  }
+  .overview-stat-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent-line, var(--accent));
+  }
+  .overview-stat-card .osc-label {
+    font-size: 0.55rem; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--text-muted); font-family: 'Share Tech Mono', monospace; margin-bottom: 8px;
+  }
+  .overview-stat-card .osc-val {
+    font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; font-weight: 700;
+    color: var(--osc-color, var(--accent)); line-height: 1;
+  }
+  .overview-stat-card .osc-sub {
+    font-size: 0.65rem; color: var(--text-muted); margin-top: 5px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* LEADERBOARD */
+  .leaderboard-table { width: 100%; border-collapse: collapse; }
+  .leaderboard-table th {
+    font-family: 'Rajdhani', sans-serif; font-size: 0.6rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--text-muted); text-align: left;
+    padding: 8px 14px; border-bottom: 1px solid var(--border); font-weight: 600;
+  }
+  .leaderboard-table td {
+    padding: 11px 14px; font-size: 0.83rem;
+    border-bottom: 1px solid rgba(30,36,51,0.5); color: var(--text-dim);
+  }
+  .leaderboard-table tr:hover td { background: rgba(245,166,35,0.03); }
+  .leaderboard-table .rank-cell {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+    color: var(--text-muted); width: 40px;
+  }
+  .rank-1 { color: #f5a623 !important; }
+  .rank-2 { color: #8a92a0 !important; }
+  .rank-3 { color: #cd7f32 !important; }
+  .leaderboard-table .name-cell { font-weight: 600; color: var(--text); }
+  .leaderboard-table .mono { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; }
+  .leaderboard-table .green { color: #00c853; }
+  .leaderboard-table .amber { color: var(--accent); }
+  .progress-bar-wrap { background: var(--bg); height: 4px; border-radius: 0; flex: 1; min-width: 60px; }
+  .progress-bar-fill { height: 100%; background: var(--accent); transition: width 0.4s; }
+
+  /* ACTIVITY FEED */
+  .activity-feed { display: flex; flex-direction: column; gap: 0; }
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid rgba(30,36,51,0.5);
+    animation: fadeUp 0.3s ease;
+  }
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    margin-top: 5px; background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .activity-dot.green { background: #00c853; box-shadow: 0 0 6px #00c853; }
+  .activity-body { flex: 1; min-width: 0; }
+  .activity-title { font-size: 0.83rem; color: var(--text); font-weight: 500; }
+  .activity-title strong { color: var(--accent); }
+  .activity-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--text-muted); margin-top: 3px; }
+  .activity-amount { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: var(--accent); flex-shrink: 0; }
+
+  /* EMPLOYEE DETAIL MODAL */
+  #emp-detail-modal {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  #emp-detail-modal.open { display: flex; }
+  .emp-detail-card {
+    background: var(--surface); border: 1px solid var(--border);
+    width: 100%; max-width: 700px; max-height: 88vh; overflow-y: auto;
+    position: relative;
+  }
+  .emp-detail-header {
+    padding: 24px 28px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+  }
+  .emp-detail-avatar {
+    width: 52px; height: 52px; background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; color: #0a0b0e;
+    flex-shrink: 0;
+  }
+  .emp-detail-info { flex: 1; }
+  .emp-detail-name { font-family: 'Rajdhani', sans-serif; font-size: 1.4rem; font-weight: 700; }
+  .emp-detail-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+  .emp-detail-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+  .emp-detail-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .emp-detail-stat { background: var(--surface2); border: 1px solid var(--border); padding: 12px 14px; }
+  .emp-detail-stat-label { font-size: 0.52rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; margin-bottom: 5px; }
+  .emp-detail-stat-val { font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+  .emp-detail-stat-val.green { color: #00c853; }
+  .emp-detail-close {
+    position: absolute; top: 16px; right: 16px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); width: 28px; height: 28px;
+    font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .emp-detail-close:hover { border-color: var(--accent2); color: var(--accent2); }
+  .emp-detail-section-title {
+    font-family: 'Rajdhani', sans-serif; font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+  }
+  /* Role change row */
+  .role-change-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface2); border: 1px solid var(--border); padding: 14px 16px;
+  }
+  .role-change-row label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); font-family: 'Share Tech Mono', monospace; flex-shrink: 0; }
+  .role-change-row select { flex: 1; }
+  .btn-role-save {
+    background: var(--accent); color: #0a0b0e;
+    border: none; padding: 9px 18px;
+    font-family: 'Rajdhani', sans-serif; font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
+    transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .btn-role-save:hover { opacity: 0.85; }
+
   /* MANAGE EMPLOYEES (manager only) */
   .manage-section { }
   .emp-mgmt-row {
@@ -834,10 +979,78 @@
 
     <!-- ALL STATS TAB (manager) -->
     <div id="tab-allstats" class="tab-content">
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-title">Staff Performance Overview</div>
-        <div class="manager-grid" id="manager-grid">
-          <div class="loading">Loading staff data...</div>
+      <div class="staff-overview">
+
+        <!-- Summary cards -->
+        <div class="overview-summary-grid" id="overview-summary"></div>
+
+        <!-- Charts row -->
+        <div class="charts-grid" style="display:grid">
+          <div class="chart-panel full-width">
+            <div class="chart-title">Team Revenue — Last 14 Days</div>
+            <div class="chart-wrap" style="height:200px">
+              <canvas id="mgr-chart-revenue"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="charts-grid" style="display:grid">
+          <div class="chart-panel" style="grid-column:1">
+            <div class="chart-title">Revenue by Employee</div>
+            <div class="chart-wrap" style="height:200px">
+              <canvas id="mgr-chart-byemp"></canvas>
+            </div>
+          </div>
+          <div class="chart-panel accent3-top">
+            <div class="chart-title">Team Services Breakdown</div>
+            <div class="chart-wrap" style="height:200px">
+              <canvas id="mgr-chart-services"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="panel">
+          <div class="panel-title">Leaderboard</div>
+          <div id="staff-leaderboard"><div class="loading">Loading...</div></div>
+        </div>
+
+        <!-- Live activity feed -->
+        <div class="panel">
+          <div class="panel-title">Recent Activity <span style="font-size:0.6rem;letter-spacing:0.15em;color:var(--text-muted);font-family:'Share Tech Mono',monospace;margin-left:8px">LIVE FEED</span></div>
+          <div id="activity-feed"><div class="loading">Loading...</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EMPLOYEE DETAIL MODAL -->
+    <div id="emp-detail-modal">
+      <div class="emp-detail-card">
+        <button class="emp-detail-close" onclick="closeEmpDetail()">✕</button>
+        <div class="emp-detail-header">
+          <div class="emp-detail-avatar" id="detail-avatar">--</div>
+          <div class="emp-detail-info">
+            <div class="emp-detail-name" id="detail-name">—</div>
+            <div class="emp-detail-sub" id="detail-sub">—</div>
+          </div>
+        </div>
+        <div class="emp-detail-body">
+          <div>
+            <div class="emp-detail-section-title">Performance</div>
+            <div class="emp-detail-stats" id="detail-stats"></div>
+          </div>
+          <div>
+            <div class="emp-detail-section-title">Change Role</div>
+            <div class="role-change-row">
+              <label>Role</label>
+              <select class="role-select" id="detail-role-select"></select>
+              <button class="btn-role-save" onclick="saveDetailRole()">SAVE ROLE</button>
+            </div>
+          </div>
+          <div>
+            <div class="emp-detail-section-title">Order History</div>
+            <div id="detail-orders"><div class="loading">Loading...</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -862,10 +1075,12 @@
               <label class="form-label">Display Name</label>
               <input type="text" class="form-input" id="new-name" placeholder="Full name">
             </div>
-            <div class="form-group" style="flex:0 0 140px">
+            <div class="form-group" style="flex:0 0 160px">
               <label class="form-label">Role</label>
               <select class="role-select" id="new-role">
-                <option value="employee">Employee</option>
+                <option value="trainee">Trainee (15%)</option>
+                <option value="mechanic">Mechanic (20%)</option>
+                <option value="head mechanic">Head Mechanic (25%)</option>
                 <option value="manager">Manager</option>
               </select>
             </div>
@@ -1362,55 +1577,264 @@ async function loadMyStats() {
   `;
 }
 
-// ===== MANAGER: ALL STATS =====
+// ===== MANAGER: ALL STATS (ADVANCED OVERVIEW) =====
+let _mgrCharts = {};
+function destroyMgrChart(id) { if (_mgrCharts[id]) { _mgrCharts[id].destroy(); delete _mgrCharts[id]; } }
+let _detailEmp = null; // currently open employee in detail modal
+
+function roleBadgeHtml(role) {
+  const cls = 'role-' + (role||'trainee').toLowerCase().replace(' ','-');
+  return `<span class="role-badge ${cls}">${(role||'—').toUpperCase()}</span>`;
+}
+function roleSelectOptions(current) {
+  return [
+    ['trainee','Trainee (15%)'],
+    ['mechanic','Mechanic (20%)'],
+    ['head mechanic','Head Mechanic (25%)'],
+    ['manager','Manager'],
+  ].map(([v,l]) => `<option value="${v}" ${current===v?'selected':''}>${l}</option>`).join('');
+}
+
 async function loadAllStats() {
-  const empsSnap = await getDocs(collection(db, 'employees'));
+  const empsSnap  = await getDocs(collection(db, 'employees'));
   const emps = [];
-  empsSnap.forEach(d => emps.push({ id: d.id, ...d.data() }));
+  empsSnap.forEach(d => emps.push({ docId: d.id, ...d.data() }));
+
   const statsSnap = await getDocs(collection(db, 'stats'));
-  const statsMap = {};
+  const statsMap  = {};
   statsSnap.forEach(d => { statsMap[d.id] = d.data(); });
 
-  const grid = document.getElementById('manager-grid');
-  if (emps.length === 0) { grid.innerHTML = '<div class="loading">No employees found.</div>'; return; }
+  // Load ALL orders for deep analysis
+  const ordersSnap = await getDocs(collection(db, 'orders'));
+  const allOrders  = [];
+  ordersSnap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
+  allOrders.sort((a,b) => {
+    const ta = a.timestamp?.toDate?.() || new Date(0);
+    const tb = b.timestamp?.toDate?.() || new Date(0);
+    return tb - ta;
+  });
 
-  // Calculate projected monthly (simple: current sales * (days in month / day of month))
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const projMultiplier = daysInMonth / dayOfMonth;
+  // ---- SUMMARY CARDS ----
+  const totalRev   = allOrders.reduce((s,o) => s + (o.total||0), 0);
+  const totalOrders = allOrders.length;
+  const activeEmps  = emps.filter(e => statsMap[e.employeeId]?.orderCount > 0).length;
+  const today       = new Date(); today.setHours(0,0,0,0);
+  const todayRev    = allOrders.filter(o => {
+    const d = o.timestamp?.toDate?.() || new Date(0); d.setHours(0,0,0,0);
+    return d.getTime() === today.getTime();
+  }).reduce((s,o) => s+(o.total||0), 0);
 
-  grid.innerHTML = emps.map(emp => {
-    const stats = statsMap[emp.employeeId] || { totalSales: 0, orderCount: 0 };
-    const projected = Math.round((stats.totalSales || 0) * projMultiplier);
-    const initials = (emp.name || emp.employeeId).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    return `
-      <div class="emp-card">
-        <div class="emp-card-header">
-          <div class="emp-avatar">${initials}</div>
-          <div>
-            <div class="emp-card-name">${emp.name || emp.employeeId}</div>
-            <div class="emp-card-id">${emp.employeeId} &bull; <span class="${emp.role === 'manager' ? 'accent2' : 'accent'}">${emp.role?.toUpperCase()}</span></div>
+  document.getElementById('overview-summary').innerHTML = [
+    { label: 'Total Team Revenue',   val: '$'+totalRev.toLocaleString(),   sub: 'All time',          color: '#f5a623', line: '#f5a623' },
+    { label: "Today's Revenue",      val: '$'+todayRev.toLocaleString(),   sub: new Date().toLocaleDateString('en-GB'), color: '#00d4ff', line: '#00d4ff' },
+    { label: 'Total Orders',         val: totalOrders,                     sub: 'All transactions',  color: '#f5a623', line: '#f5a623' },
+    { label: 'Active Employees',     val: activeEmps + ' / ' + emps.length, sub: 'Have made orders', color: '#00c853', line: '#00c853' },
+  ].map(c => `
+    <div class="overview-stat-card" style="--osc-color:${c.color};--accent-line:${c.line}">
+      <div class="osc-label">${c.label}</div>
+      <div class="osc-val">${c.val}</div>
+      <div class="osc-sub">${c.sub}</div>
+    </div>`).join('');
+
+  // ---- CHART: Team Revenue Last 14 days ----
+  const days = 14;
+  const dayLabels = [];
+  const dayRevMap = {};
+  for (let i = days-1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const key = d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+    dayLabels.push(key); dayRevMap[key] = 0;
+  }
+  allOrders.forEach(o => {
+    if (!o.timestamp) return;
+    const d = o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp);
+    const key = d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+    if (dayRevMap[key] !== undefined) dayRevMap[key] += o.total||0;
+  });
+
+  destroyMgrChart('revenue');
+  const ctx1 = document.getElementById('mgr-chart-revenue').getContext('2d');
+  const rg = ctx1.createLinearGradient(0,0,0,200);
+  rg.addColorStop(0,'rgba(245,166,35,0.55)'); rg.addColorStop(1,'rgba(245,166,35,0.04)');
+  _mgrCharts['revenue'] = new Chart(ctx1, {
+    type: 'bar',
+    data: { labels: dayLabels, datasets: [{ label: 'Revenue', data: dayLabels.map(l=>dayRevMap[l]), backgroundColor: rg, borderColor: 'rgba(245,166,35,0.8)', borderWidth: 1, borderRadius: 2 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#111318', borderColor:'#1e2433', borderWidth:1, titleColor:'#f5a623', bodyColor:'#8a92a0', titleFont:{family:"'Share Tech Mono',monospace",size:11}, bodyFont:{family:"'Share Tech Mono',monospace",size:11}, callbacks:{ label: c => ' $'+c.parsed.y.toLocaleString() } } }, scales:{ x:{ grid:{color:'rgba(30,36,51,0.6)'}, ticks:{color:'#5a6070',font:{family:"'Share Tech Mono',monospace",size:10}}, border:{color:'#1e2433'} }, y:{ grid:{color:'rgba(30,36,51,0.6)'}, ticks:{color:'#5a6070',font:{family:"'Share Tech Mono',monospace",size:10}, callback:v=>'$'+v.toLocaleString()}, border:{color:'#1e2433'} } } }
+  });
+
+  // ---- CHART: Revenue by employee (horizontal bar) ----
+  const empRevTotals = emps.map(e => ({
+    name: (e.name||e.employeeId).split(' ')[0],
+    rev: statsMap[e.employeeId]?.totalSales || 0,
+  })).sort((a,b) => b.rev-a.rev);
+  const PALETTE = ['#f5a623','#00d4ff','#00c853','#e8351a','#a855f7','#f97316','#06b6d4'];
+
+  destroyMgrChart('byemp');
+  const ctx2 = document.getElementById('mgr-chart-byemp').getContext('2d');
+  _mgrCharts['byemp'] = new Chart(ctx2, {
+    type: 'bar',
+    data: { labels: empRevTotals.map(e=>e.name), datasets: [{ label: 'Revenue', data: empRevTotals.map(e=>e.rev), backgroundColor: empRevTotals.map((_,i)=>PALETTE[i%PALETTE.length]+'99'), borderColor: empRevTotals.map((_,i)=>PALETTE[i%PALETTE.length]), borderWidth: 1, borderRadius: 2 }] },
+    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#111318', borderColor:'#1e2433', borderWidth:1, titleColor:'#f5a623', bodyColor:'#8a92a0', titleFont:{family:"'Share Tech Mono',monospace",size:11}, bodyFont:{family:"'Share Tech Mono',monospace",size:11}, callbacks:{ label: c => ' $'+c.parsed.x.toLocaleString() } } }, scales:{ x:{ grid:{color:'rgba(30,36,51,0.6)'}, ticks:{color:'#5a6070',font:{family:"'Share Tech Mono',monospace",size:10}, callback:v=>'$'+v.toLocaleString()}, border:{color:'#1e2433'} }, y:{ grid:{display:false}, ticks:{color:'#e8eaf0',font:{family:"'Share Tech Mono',monospace",size:10}}, border:{color:'#1e2433'} } } }
+  });
+
+  // ---- CHART: Team services doughnut ----
+  const svcCount = {};
+  allOrders.forEach(o => (o.items||[]).forEach(item => { svcCount[item] = (svcCount[item]||0)+1; }));
+  const topSvc = Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  destroyMgrChart('services');
+  if (topSvc.length > 0) {
+    const ctx3 = document.getElementById('mgr-chart-services').getContext('2d');
+    _mgrCharts['services'] = new Chart(ctx3, {
+      type: 'doughnut',
+      data: { labels: topSvc.map(([n])=>n), datasets: [{ data: topSvc.map(([,c])=>c), backgroundColor: PALETTE.slice(0,topSvc.length), borderColor:'#0a0b0e', borderWidth:3, hoverOffset:6 }] },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{ position:'right', labels:{ color:'#8a92a0', font:{family:"'Share Tech Mono',monospace",size:9}, boxWidth:10, padding:10, generateLabels: chart => chart.data.labels.map((label,i) => ({ text: label.length>18?label.slice(0,17)+'…':label, fillStyle:PALETTE[i%PALETTE.length], strokeStyle:'#0a0b0e', index:i })) } }, tooltip:{ backgroundColor:'#111318', borderColor:'#1e2433', borderWidth:1, titleColor:'#f5a623', bodyColor:'#8a92a0', titleFont:{family:"'Share Tech Mono',monospace",size:11}, bodyFont:{family:"'Share Tech Mono',monospace",size:11}, callbacks:{ label: c => ` ${c.parsed} orders` } } } }
+    });
+  }
+
+  // ---- LEADERBOARD ----
+  const maxRev = Math.max(1, ...emps.map(e => statsMap[e.employeeId]?.totalSales||0));
+  const sorted = [...emps].sort((a,b) => (statsMap[b.employeeId]?.totalSales||0) - (statsMap[a.employeeId]?.totalSales||0));
+  document.getElementById('staff-leaderboard').innerHTML = `
+    <table class="leaderboard-table">
+      <thead><tr>
+        <th>#</th><th>Employee</th><th>Role</th><th>Revenue</th><th>Orders</th><th>Commission</th><th>Avg Order</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${sorted.map((emp, i) => {
+          const s = statsMap[emp.employeeId] || {};
+          const rev  = s.totalSales || 0;
+          const cnt  = s.orderCount || 0;
+          const rate = getCommission(emp.role);
+          const comm = s.totalCommission || Math.round(rev * rate);
+          const avg  = cnt > 0 ? Math.round(rev/cnt) : 0;
+          const pct  = Math.round((rev/maxRev)*100);
+          const rankCls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+          return `<tr style="cursor:pointer" onclick="openEmpDetail('${emp.docId}')">
+            <td class="rank-cell ${rankCls}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</td>
+            <td class="name-cell">
+              ${emp.name||emp.employeeId}
+              <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+                <span style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-muted)">${pct}%</span>
+              </div>
+            </td>
+            <td>${roleBadgeHtml(emp.role)}</td>
+            <td class="mono amber">$${rev.toLocaleString()}</td>
+            <td class="mono">${cnt}</td>
+            <td class="mono green">${rate > 0 ? '$'+comm.toLocaleString() : '—'}</td>
+            <td class="mono">$${avg.toLocaleString()}</td>
+            <td><button class="btn-sm" onclick="event.stopPropagation();openEmpDetail('${emp.docId}')">VIEW</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+
+  // ---- ACTIVITY FEED (last 20 orders) ----
+  const feed = allOrders.slice(0, 20);
+  const empNameMap = {};
+  emps.forEach(e => { empNameMap[e.employeeId] = e.name || e.employeeId; });
+  document.getElementById('activity-feed').innerHTML = feed.length === 0
+    ? '<div class="loading">No activity yet.</div>'
+    : `<div class="activity-feed">${feed.map(o => {
+        let timeStr = '—';
+        if (o.timestamp) {
+          const d = o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp);
+          timeStr = d.toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+        }
+        const name = empNameMap[o.employeeId] || o.employeeId;
+        return `<div class="activity-item">
+          <div class="activity-dot green"></div>
+          <div class="activity-body">
+            <div class="activity-title"><strong>${name}</strong> completed an order for ${o.customer||'Walk-in'}</div>
+            <div class="activity-meta">${(o.items||[]).join(' · ')} &bull; ${timeStr}</div>
           </div>
-        </div>
-        <div class="emp-card-stats">
-          <div class="emp-stat">
-            <div class="emp-stat-label">Total Sales</div>
-            <div class="emp-stat-val">$${(stats.totalSales||0).toLocaleString()}</div>
-          </div>
-          <div class="emp-stat">
-            <div class="emp-stat-label">Orders</div>
-            <div class="emp-stat-val">${stats.orderCount||0}</div>
-          </div>
-        </div>
-        <div class="emp-projected">
-          <span class="emp-projected-label">Projected Monthly</span>
-          <span class="emp-projected-val">$${projected.toLocaleString()}</span>
-        </div>
-      </div>
-    `;
-  }).join('');
+          <div class="activity-amount">$${(o.total||0).toLocaleString()}</div>
+        </div>`;
+      }).join('')}</div>`;
+
+  // Store for detail modal
+  window._allEmpsCache   = emps;
+  window._statsMapCache  = statsMap;
+  window._allOrdersCache = allOrders;
+  window._empNameMapCache = empNameMap;
 }
+
+// ---- EMPLOYEE DETAIL MODAL ----
+window.openEmpDetail = async function(docId) {
+  const emps   = window._allEmpsCache || [];
+  const emp    = emps.find(e => e.docId === docId);
+  if (!emp) return;
+  _detailEmp = emp;
+
+  const stats  = (window._statsMapCache||{})[emp.employeeId] || {};
+  const orders = (window._allOrdersCache||[]).filter(o => o.employeeId === emp.employeeId);
+  const rate   = getCommission(emp.role);
+  const comm   = stats.totalCommission || Math.round((stats.totalSales||0)*rate);
+  const avg    = stats.orderCount > 0 ? Math.round((stats.totalSales||0)/stats.orderCount) : 0;
+  const initials = (emp.name||emp.employeeId).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+  document.getElementById('detail-avatar').textContent = initials;
+  document.getElementById('detail-name').textContent   = emp.name || emp.employeeId;
+  document.getElementById('detail-sub').innerHTML      = `${emp.employeeId} &bull; ${(emp.role||'').toUpperCase()}`;
+
+  document.getElementById('detail-stats').innerHTML = [
+    { label:'Total Revenue', val:'$'+(stats.totalSales||0).toLocaleString(), green:false },
+    { label:'Orders',        val: stats.orderCount||0,                        green:false },
+    { label:'Avg Order',     val:'$'+avg.toLocaleString(),                    green:false },
+    { label:'Commission',    val: rate>0?'$'+comm.toLocaleString():'N/A',     green: rate>0 },
+  ].map(s => `<div class="emp-detail-stat">
+    <div class="emp-detail-stat-label">${s.label}</div>
+    <div class="emp-detail-stat-val ${s.green?'green':''}">${s.val}</div>
+  </div>`).join('');
+
+  document.getElementById('detail-role-select').innerHTML = roleSelectOptions(emp.role);
+
+  const recentOrders = orders.slice(0,10);
+  document.getElementById('detail-orders').innerHTML = recentOrders.length === 0
+    ? '<div class="loading">No orders yet.</div>'
+    : `<table class="history-table">
+        <thead><tr><th>Customer</th><th>Services</th><th>Total</th><th>Date</th></tr></thead>
+        <tbody>${recentOrders.map(o => {
+          let ds = '—';
+          if (o.timestamp) { const d = o.timestamp.toDate?o.timestamp.toDate():new Date(o.timestamp); ds = d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+          return `<tr>
+            <td class="customer">${o.customer||'Walk-in'}</td>
+            <td style="max-width:200px;color:var(--text-muted);font-size:0.73rem">${(o.items||[]).join(', ')}</td>
+            <td class="amount">$${(o.total||0).toLocaleString()}</td>
+            <td class="time">${ds}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+
+  document.getElementById('emp-detail-modal').classList.add('open');
+};
+
+window.closeEmpDetail = function() {
+  document.getElementById('emp-detail-modal').classList.remove('open');
+  _detailEmp = null;
+};
+
+window.saveDetailRole = async function() {
+  if (!_detailEmp) return;
+  const newRole = document.getElementById('detail-role-select').value;
+  try {
+    await updateDoc(doc(db, 'employees', _detailEmp.docId), { role: newRole });
+    showToast(`${_detailEmp.name||_detailEmp.employeeId} role updated to ${newRole}`, 'success');
+    // Update local cache so re-open shows new role
+    _detailEmp.role = newRole;
+    document.getElementById('detail-sub').innerHTML = `${_detailEmp.employeeId} &bull; ${newRole.toUpperCase()}`;
+    // Refresh both tabs
+    loadAllStats();
+    loadManageStaff();
+  } catch(e) {
+    showToast('Error updating role: '+e.message, 'error');
+  }
+};
+
+// Close modal on backdrop click
+document.getElementById('emp-detail-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEmpDetail();
+});
 
 // ===== MANAGER: MANAGE STAFF =====
 async function loadManageStaff() {
@@ -1422,10 +1846,13 @@ async function loadManageStaff() {
   if (emps.length === 0) { listEl.innerHTML = '<div class="loading">No employees yet.</div>'; return; }
 
   listEl.innerHTML = emps.map(emp => `
-    <div class="emp-mgmt-row">
+    <div class="emp-mgmt-row" style="flex-wrap:wrap;gap:8px">
       <span class="emp-mgmt-id">${emp.employeeId}</span>
       <span class="emp-mgmt-name">${emp.name || '—'}</span>
-      <span class="emp-mgmt-role ${emp.role === 'manager' ? 'role-manager' : 'role-employee'}">${emp.role}</span>
+      <select class="role-select" id="role-sel-${emp.docId}" style="flex:0 0 160px;padding:5px 10px;font-size:0.72rem">
+        ${roleSelectOptions(emp.role)}
+      </select>
+      <button class="btn-sm" onclick="window._changeRole('${emp.docId}', '${emp.name||emp.employeeId}')">SAVE ROLE</button>
       <button class="btn-sm danger" onclick="window._removeEmp('${emp.docId}', '${emp.name || emp.employeeId}')">REMOVE</button>
     </div>
   `).join('');
@@ -1441,6 +1868,21 @@ window._removeEmp = (docId, name) => {
       loadManageStaff();
     }
   );
+};
+
+window._changeRole = async (docId, name) => {
+  const sel = document.getElementById('role-sel-' + docId);
+  if (!sel) return;
+  const newRole = sel.value;
+  try {
+    await updateDoc(doc(db, 'employees', docId), { role: newRole });
+    showToast(`${name} is now ${newRole}`, 'success');
+    loadManageStaff();
+    // refresh overview if visible
+    if (document.getElementById('tab-allstats').classList.contains('active')) loadAllStats();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
 };
 
 window.addEmployee = async function() {
